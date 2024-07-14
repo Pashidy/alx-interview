@@ -1,15 +1,16 @@
 #!/usr/bin/python3
 """
-To calculate the min No. of Ops needed to result in exactly n H characters
+This module defines a function to calculate the minimum number of operations
+needed to result in exactly n 'H' characters in a text file starting with a single 'H'.
 """
 
 def minOperations(n):
     """
     Calculate the minimum number of operations needed to get exactly n 'H' characters.
-
+    
     Args:
         n (int): The target number of 'H' characters.
-
+        
     Returns:
         int: The minimum number of operations needed, or 0 if n is not achievable.
     """
