@@ -3,7 +3,6 @@
 To calculate the min No. of Ops needed to result in exactly n H characters
 """
 
-
 def minOperations(n):
     """
     Calculate the minimum number of operations needed to get exactly n 'H' characters.
@@ -14,7 +13,6 @@ def minOperations(n):
     Returns:
         int: The minimum number of operations needed, or 0 if n is not achievable.
     """
-
     if n <= 1:
         return 0
 
@@ -27,5 +25,4 @@ def minOperations(n):
             n //= factor
         factor += 1
 
-
-    return (operations)
+    return operations
