@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 """
 To calculate the min No. of Ops needed to result in exactly n H characters
 """
