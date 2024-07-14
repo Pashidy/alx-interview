@@ -6,7 +6,13 @@ To calculate the min No. of Ops needed to result in exactly n H characters
 
 def minOperations(n):
     """
-    Min Ops
+    Calculate the minimum number of operations needed to get exactly n 'H' characters.
+
+    Args:
+        n (int): The target number of 'H' characters.
+
+    Returns:
+        int: The minimum number of operations needed, or 0 if n is not achievable.
     """
 
     if n <= 1:
