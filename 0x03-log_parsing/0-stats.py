@@ -14,6 +14,7 @@ def printsts(dic, size):
         if dic[i] != 0:
             print("{}: {:d}".format(i, dic[i]))
 
+
 sts = {"200": 0, "301": 0, "400": 0, "401": 0, "403": 0,
        "404": 0, "405": 0, "500": 0}
 
@@ -36,7 +37,7 @@ try:
 
         try:
             if stlist[-2] in sts:
-            sts[stlist[-2]] += 1
+               sts[stlist[-2]] += 1
         except:
             pass
     printsts(sts, size)
