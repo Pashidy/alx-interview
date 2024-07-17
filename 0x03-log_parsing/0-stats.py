@@ -5,27 +5,39 @@ A script that reads stdin line by line and computes metrics.
 import sys
 import signal
 
-total_size = 0
-status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-line_count = 0
 
+def print_msg(dict_sc, total_file_size):
+    """
+    Method to print statistics.
 
-def print_statistics():
+    Args:
+        dict_sc: Dictionary of status codes and their counts.
+        total_file_size: Total size of all files processed.
     """
-    To show stats
-    """
-    global total_size, status_codes
-    print("File size: {}".format(total_size))
-    for code in sorted(status_codes.keys()):
-        if status_codes[code] > 0:
-            print("{}: {}".format(code, status_codes[code]))
+    print("File size: {}".format(total_file_size))
+    for key, val in sorted(dict_sc.items()):
+        if val != 0:
+            print("{}: {}".format(key, val))
+
+total_file_size = 0
+counter = 0
+dict_sc = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
 
 
 def signal_handler(sig, frame):
     """
-    To send signals
+    Handle the interrupt signal to print the final statistics.
     """
-    print_statistics()
+    print_msg(dict_sc, total_file_size)
     sys.exit(0)
 
 
@@ -33,32 +45,24 @@ signal.signal(signal.SIGINT, signal_handler)
 
 try:
     for line in sys.stdin:
-        line_count += 1
-
-        parts = line.split()
-        if len(parts) < 10:
+        parsed_line = line.split()
+        if len(parsed_line) != 10:
             continue
 
-        ip = parts[0]
-        dash = parts[1]
-        date = parts[2] + ' ' + parts[3] + ' ' + parts[4]
-        request = parts[5] + ' ' + parts[6] + ' ' + parts[7]
-        status_code = parts[8]
-        file_size = parts[9]
+        counter += 1
+        total_file_size += int(parsed_line[-1])
+        code = parsed_line[-2]
 
-        if not status_code.isdigit() or not file_size.isdigit():
-            continue
+        if code in dict_sc:
+            dict_sc[code] += 1
 
-        status_code = int(status_code)
-        file_size = int(file_size)
-
-        total_size += file_size
-        if status_code in status_codes:
-            status_codes[status_code] += 1
-
-        if line_count % 10 == 0:
-            print_statistics()
+        if counter == 10:
+            print_msg(dict_sc, total_file_size)
+            counter = 0
 
 except KeyboardInterrupt:
-    print_statistics()
+    print_msg(dict_sc, total_file_size)
     sys.exit(0)
+
+# Print any remaining statistics when the script ends naturally
+print_msg(dict_sc, total_file_size)
