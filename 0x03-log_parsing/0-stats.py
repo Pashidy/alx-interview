@@ -9,6 +9,7 @@ total_size = 0
 status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
 line_count = 0
 
+
 def print_statistics():
     """
     To show stats
@@ -19,12 +20,14 @@ def print_statistics():
         if status_codes[code] > 0:
             print("{}: {}".format(code, status_codes[code]))
 
+
 def signal_handler(sig, frame):
     """
     To send signals
     """
     print_statistics()
     sys.exit(0)
+
 
 signal.signal(signal.SIGINT, signal_handler)
 
