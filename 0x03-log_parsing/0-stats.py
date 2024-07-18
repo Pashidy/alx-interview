@@ -36,10 +36,8 @@ if __name__ == "__main__":
                 code = match.group(1)
                 file_size = int(match.group(2))
 
-                # File size
                 log["file_size"] += file_size
 
-                # status code
                 if (code.isdecimal()):
                     log["code_frequency"][code] += 1
 
