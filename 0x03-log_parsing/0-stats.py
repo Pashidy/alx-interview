@@ -1,56 +1,53 @@
 #!/usr/bin/python3
-
+"""
+A script that reads stdin line by line and computes metrics.
+"""
 import sys
-import signal
-
-total_size = 0
-status_codes = {200: 0, 301: 0, 400: 0, 401: 0, 403: 0, 404: 0, 405: 0, 500: 0}
-line_count = 0
+import re
 
 
-def print_statistics():
-    global total_size, status_codes
-    print("File size: {}".format(total_size))
-    for code in sorted(status_codes.keys()):
-        if status_codes[code] > 0:
-            print("{}: {}".format(code, status_codes[code]))
+def output(log: dict) -> None:
+    """
+    A fxn thats shows select statistics
+    """
+    print("File size: {}".format(log["file_size"]))
+    for code in sorted(log["code_frequency"]):
+        if log["code_frequency"][code]:
+            print("{}: {}".format(code, log["code_frequency"][code]))
 
 
-def signal_handler(sig, frame):
-    print_statistics()
-    sys.exit(0)
+if __name__ == "__main__":
+    regex = re.compile(
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} - - \[\d{4}-\d{2}-\d{2} '
+        r'\d{2}:\d{2}:\d{2}\.\d+\] "GET /projects/260 HTTP/1.1" (\d{3}) (\d+)')
 
+    line_count = 0
+    log = {
+        "file_size": 0,
+        "code_frequency": {str(code): 0 for code in [
+            200, 301, 400, 401, 403, 404, 405, 500]}
+    }
 
-signal.signal(signal.SIGINT, signal_handler)
+    try:
+        for line in sys.stdin:
+            line = line.strip()
+            match = regex.fullmatch(line)
+            if match:
+                line_count += 1
+                code = match.group(1)
+                file_size = int(match.group(2))
 
-try:
-    for line in sys.stdin:
-        line_count += 1
+                # Update file size
+                log["file_size"] += file_size
 
-        parts = line.split()
-        if len(parts) != 9:
-            continue
+                # Update status code count
+                if code in log["code_frequency"]:
+                    log["code_frequency"][code] += 1
 
-        ip = parts[0]
-        dash = parts[1]
-        date = parts[2] + ' ' + parts[3] + ' ' + parts[4]
-        request = parts[5] + ' ' + parts[6] + ' ' + parts[7]
-        status_code = parts[8]
-        file_size = parts[9]
-
-        if not status_code.isdigit() or not file_size.isdigit():
-            continue
-
-        status_code = int(status_code)
-        file_size = int(file_size)
-
-        total_size += file_size
-        if status_code in status_codes:
-            status_codes[status_code] += 1
-
-        if line_count % 10 == 0:
-            print_statistics()
-
-except KeyboardInterrupt:
-    print_statistics()
-    sys.exit(0)
+                if line_count % 10 == 0:
+                    output(log)
+    except KeyboardInterrupt:
+        output(log)
+        raise
+    finally:
+        output(log)
