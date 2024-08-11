@@ -1,36 +1,29 @@
 #!/usr/bin/node
 
 const request = require('request');
+const starWarsAPI = 'https://swapi-api.alx-tools.com/api/';
+const endPoint = 'films/';
+const movieID = process.argv[2];
 
-// Get the Movie ID from the first positional argument
-const movieId = process.argv[2];
-if (!movieId) {
-  console.error('Usage: ./0-starwars_characters.js <movie_id>');
-  process.exit(1);
-}
-
-// Star Wars API URL
-const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
-
-request(apiUrl, (error, response, body) => {
+request(starWarsAPI + endPoint + movieID, function (error, _, body) {
   if (error) {
     console.error(error);
     return;
   }
-
-  const filmData = JSON.parse(body);
-  const characters = filmData.characters;
-
-  // Ensure the characters are printed in the correct order
-  characters.forEach((characterUrl, index) => {
-    request(characterUrl, (error, response, body) => {
-      if (error) {
-        console.error(error);
-        return;
-      }
-
-      const characterData = JSON.parse(body);
-      console.log(characterData.name);
-    });
-  });
+  const objects = JSON.parse(body);
+  const casts = objects.characters;
+  printResult(casts);
 });
+
+function printResult(casts, counter = 0) {
+  request(casts[counter], function (error, _, body) {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log(JSON.parse(body).name);
+    if (counter + 1 < casts.length) {
+      printResult(casts, counter + 1);
+    }
+  });
+}
