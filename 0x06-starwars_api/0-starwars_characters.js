@@ -1,29 +1,36 @@
 #!/usr/bin/node
 
-const axios = require('axios');
+const request = require('request');
 
 // Get the Movie ID from the first positional argument
 const movieId = process.argv[2];
+if (!movieId) {
+  console.error('Usage: ./0-starwars_characters.js <movie_id>');
+  process.exit(1);
+}
 
 // Star Wars API URL
 const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
-// Make the HTTP request to the Star Wars API
-axios.get(apiUrl)
-  .then(response => {
-    const characters = response.data.characters;
-
-    // Create an array of Promises for each character request
-    const characterPromises = characters.map(characterUrl => {
-      return axios.get(characterUrl).then(res => res.data.name);
-    });
-
-    // Resolve all Promises and print character names in order
-    return Promise.all(characterPromises);
-  })
-  .then(names => {
-    names.forEach(name => console.log(name));
-  })
-  .catch(error => {
+request(apiUrl, (error, response, body) => {
+  if (error) {
     console.error(error);
+    return;
+  }
+
+  const filmData = JSON.parse(body);
+  const characters = filmData.characters;
+
+  // Ensure the characters are printed in the correct order
+  characters.forEach((characterUrl, index) => {
+    request(characterUrl, (error, response, body) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const characterData = JSON.parse(body);
+      console.log(characterData.name);
+    });
   });
+});
