@@ -12,18 +12,20 @@ request(starWarsAPI + endPoint + movieID, function (error, _, body) {
   }
   const objects = JSON.parse(body);
   const casts = objects.characters;
-  printResult(casts);
+  printCharacters(casts);
 });
 
-function printResult(casts, counter = 0) {
-  request(casts[counter], function (error, _, body) {
+function printCharacters(casts, index = 0) {
+  if (index >= casts.length) {
+    return;
+  }
+
+  request(casts[index], function (error, _, body) {
     if (error) {
       console.error(error);
       return;
     }
     console.log(JSON.parse(body).name);
-    if (counter + 1 < casts.length) {
-      printResult(casts, counter + 1);
-    }
+    printCharacters(casts, index + 1);
   });
 }
