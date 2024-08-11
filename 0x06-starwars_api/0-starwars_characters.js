@@ -1,6 +1,6 @@
 #!/usr/bin/node
 
-const request = require('request');
+const axios = require('axios');
 
 // Get the Movie ID from the first positional argument
 const movieId = process.argv[2];
@@ -8,34 +8,22 @@ const movieId = process.argv[2];
 // Star Wars API URL
 const apiUrl = `https://swapi-api.hbtn.io/api/films/${movieId}/`;
 
-request(apiUrl, (error, response, body) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
+// Make the HTTP request to the Star Wars API
+axios.get(apiUrl)
+  .then(response => {
+    const characters = response.data.characters;
 
-  const filmData = JSON.parse(body);
-  const characters = filmData.characters;
-
-  // Create an array of Promises for each character request
-  const characterPromises = characters.map(characterUrl => {
-    return new Promise((resolve, reject) => {
-      request(characterUrl, (error, response, body) => {
-        if (error) {
-          reject(error);
-        } else {
-          const characterData = JSON.parse(body);
-          resolve(characterData.name);
-        }
-      });
+    // Create an array of Promises for each character request
+    const characterPromises = characters.map(characterUrl => {
+      return axios.get(characterUrl).then(res => res.data.name);
     });
+
+    // Resolve all Promises and print character names in order
+    return Promise.all(characterPromises);
+  })
+  .then(names => {
+    names.forEach(name => console.log(name));
+  })
+  .catch(error => {
+    console.error(error);
   });
-
-  // Resolve all Promises and print character names in order
-  Promise.all(characterPromises)
-    .then(names => {
-      names.forEach(name => console.log(name));
-    })
-    .catch(error => console.error(error));
-});
-
