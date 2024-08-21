@@ -2,25 +2,30 @@
 """
 To determine the fewest number of coins needed to meet a given amount total.
 """
+from collections import deque
 
 
 def makeChange(coins, total):
     if total <= 0:
         return 0
 
-    # Sort coins in descending order to ensure larger denominations first
-    coins.sort(reverse=True)
+    # Initialize a queue for BFS
+    queue = deque([(0, 0)])  # (Current total, number of coins)
+    visited = set([0])
 
-    # Create a dp array with 'infinity' to represent unreachable amounts
-    dp = [float('inf')] * (total + 1)
+    while queue:
+        current_total, num_coins = queue.popleft()
 
-    # Base case: 0 coins needed to reach a total of 0
-    dp[0] = 0
+        for coin in coins:
+            next_total = current_total + coin
+            if next_total == total:
+                return num_coins + 1
+            if next_total > total:
+                continue
+            if next_total not in visited:
+                visited.add(next_total)
+                queue.append(
+                        (next_total, num_coins + 1)
+                )
 
-    # Loop through each coin and update dp for possible totals
-    for coin in coins:
-        for i in range(coin, total + 1):
-            dp[i] = min(dp[i], dp[i - coin] + 1)
-
-    # If dp[total] is still infinity, it means the total cannot be met
-    return dp[total] if dp[total] != float('inf') else -1
+    return -1
