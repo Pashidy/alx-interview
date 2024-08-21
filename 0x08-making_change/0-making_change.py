@@ -8,6 +8,9 @@ def makeChange(coins, total):
     if total <= 0:
         return 0
 
+    # Sort coins in descending order to ensure larger denominations first
+    coins.sort(reverse=True)
+
     # Create a dp array with 'infinity' to represent unreachable amounts
     dp = [float('inf')] * (total + 1)
 
