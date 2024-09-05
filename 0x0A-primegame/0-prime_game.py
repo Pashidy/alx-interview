@@ -16,7 +16,13 @@ def sieve_of_eratosthenes(max_n):
 
 
 def count_primes(n, primes):
+<<<<<<< HEAD
     """Count how many primes exist from 1 to n using the primes list."""
+=======
+    """
+    Count how many primes exist from 1 to n using the primes list.
+    """
+>>>>>>> ae7692d06a0b1277fc9f19f3a1557cf67e114346
     count = 0
     for prime in primes:
         if prime > n:
