@@ -2,47 +2,62 @@
 """Prime Game execution"""
 
 
-def sieve_of_eratosthenes(max_n):
-    """Generate a list indicating prime status up to max_n using Sieve of Eratosthenes."""
-    is_prime = [True] * (max_n + 1)
-    is_prime[0] = is_prime[1] = False  # 0 and 1 are not primes
-    for i in range(2, int(max_n ** 0.5) + 1):
-        if is_prime[i]:
-            for j in range(i * i, max_n + 1, i):
-                is_prime[j] = False
-    return is_prime
+def prime_numbers(n):
+    """Returns a list of prime numbers between 1 and n inclusive.
 
+    Args:
+        n (int): The upper boundary. The lower boundary is always 1.
 
-def count_primes_up_to_n(is_prime, n):
-    """Count how many primes exist from 1 to n using the is_prime list."""
-    count = 0
-    for i in range(1, n + 1):
-        if is_prime[i]:
-            count += 1
-    return count
+    Returns:
+        list: A list of prime numbers up to and including n.
+    """
+    if n < 2:
+        return [0] * (n + 1)
+
+    primes = [1] * (n + 1)
+    primes[0], primes[1] = 0, 0  # 0 and 1 are not primes
+
+    for i in range(2, int(n**0.5) + 1):
+        if primes[i] == 1:
+            for j in range(i * i, n + 1, i):
+                primes[j] = 0  # Mark multiples of i as not prime
+
+    return primes
 
 
 def isWinner(x, nums):
-    if x < 1 or not nums:
+    """
+    Determines the winner of the Prime Game.
+
+    Args:
+        x (int): The number of rounds of the game.
+        nums (list of int): The upper limit of the range for each round.
+
+    Returns:
+        str: The name of the winner, or None if no clear winner.
+    """
+    if x <= 0 or not nums:
         return None
 
-    max_n = max(nums)
-    is_prime = sieve_of_eratosthenes(max_n)
-
+    # Initialize counts for Maria and Ben
     maria_wins = 0
     ben_wins = 0
 
-    for n in nums:
-        prime_count = count_primes_up_to_n(is_prime, n)
-        # If the number of primes is odd, Maria wins; if even, Ben wins.
-        if prime_count % 2 == 1:
-            maria_wins += 1
-        else:
-            ben_wins += 1
+    # Find the maximum number to generate primes up to that number
+    max_num = max(nums)
+    primes = prime_numbers(max_num)
 
+    # Determine the winner per round
+    for n in nums:
+        prime_count = sum(primes[:n + 1])
+        if prime_count % 2 == 0:
+            ben_wins += 1
+        else:
+            maria_wins += 1
+
+    # Determine overall winner
     if maria_wins > ben_wins:
         return "Maria"
     elif ben_wins > maria_wins:
         return "Ben"
-    else:
-        return None
+    return None
